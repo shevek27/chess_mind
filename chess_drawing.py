@@ -18,7 +18,7 @@ for piece in pieces:
     piece_images[piece] = pygame.image.load(f"images/{piece}.png")
     piece_images[piece] = pygame.transform.scale(piece_images[piece], (square_size, square_size))
 
-icon = pygame.image.load("images/wow-icon.png")
+icon = pygame.image.load("images/chess_icon.png")
 pygame.display.set_icon(icon)
 
 # Colors

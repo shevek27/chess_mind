@@ -10,20 +10,23 @@ print("imports completed")
 # Initialize Pygame
 pygame.init()
 
-def make_move(board, move, selected_square, square):
+def make_move(move, board):
+    if move in board.legal_moves:
+        move_sound(board, move)
+        board.push(move)
+        global t
+        t += 1
+        return True
+    else:
+        return False
+
+def player_move(board, move, selected_square, square):
     try:
         move = board.find_move(selected_square, square)
     except:
         pass
 
-    if move in board.legal_moves:
-        move_sound(board, move)
-        board.push(move)
-        updated_fen = board.fen()
-        global t
-        t += 1
-        return True
-    return False
+    make_move(move, board)
         
 def get_square(event):
     x, y = event.pos
@@ -51,17 +54,16 @@ def main():
                 running = False
 
             elif board.turn == False and not board.is_checkmate():
-                move = find_best_move(board, 2)
-                move_sound(board, move)
+                move = find_best_move(board, 5)
+                make_move(move, board)
 
-                board.push(move)
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 board = chess.Board()
 
             
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_h:
-                print(find_best_move(board, 3))
+                print(find_best_move(board, 5))
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 try:
@@ -85,7 +87,7 @@ def main():
                     square = get_square(event)
                     if square != selected_square:
                         move = chess.Move(dragging_piece, square)
-                        if make_move(board, move, selected_square, square):
+                        if player_move(board, move, selected_square, square):
                             selected_square = None
 
                             
@@ -98,7 +100,7 @@ def main():
                 elif selected_square != None:
                     square = get_square(event)
                     move = chess.Move(selected_square, square)
-                    if make_move(board, move, selected_square, square):
+                    if player_move(board, move, selected_square, square):
                         selected_square = None
                     elif board.piece_at(square) == None:
                         selected_square = None
