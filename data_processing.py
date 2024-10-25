@@ -82,24 +82,14 @@ def extract_board_and_labels(game):
 
 def save_data(x_data, y_data, file_path):
     # save data in batches using pickle
-    # Check if the file exists
     with open(file_path, "ab") as file:
-        pickle.dump(list(zip(x_data, y_data)), file)
+        packed_data = list(zip(x_data, y_data))
+        pickle.dump(packed_data, file)
+    print(f"Saved {len(packed_data)} pairs to {file_path}.")
     
     x_data.clear()
     y_data.clear()
 
-
-def load_batches(filename):
-    
-    # loads batches of data from a pickle file
-    with open(filename, "rb") as f:
-        while True:
-            try:
-                batch = pickle.load(f)
-                yield batch
-            except EOFError:
-                break
 
 def prepare_training_dataset(in_file, out_file):
 
@@ -127,6 +117,8 @@ def prepare_training_dataset(in_file, out_file):
 
     if all_x and all_y:
         save_data(all_x, all_y, out_file)
+
+
 
 
 prepare_training_dataset("lichess_2020_oct_filtered.pgn", "processed_lichess_2020_oct_filtered.pkl")
