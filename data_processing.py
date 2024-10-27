@@ -82,11 +82,13 @@ def extract_board_and_labels(game):
 
 def save_data(x_data, y_data, file_path):
     # save data in batches using pickle
+    data = {
+        "features":x_data,
+        "labels":y_data
+    }
     with open(file_path, "ab") as file:
-        packed_data = list(zip(x_data, y_data))
-        pickle.dump(packed_data, file)
-    print(f"Saved {len(packed_data)} pairs to {file_path}.")
-    
+        pickle.dump(data, file)
+    print(f"Saved {len(x_data)} entries to {file_path}.")    
     x_data.clear()
     y_data.clear()
 
@@ -106,9 +108,10 @@ def prepare_training_dataset(in_file, out_file):
         # extend instead of append to add elements not lists
         all_x.extend(x)
         all_y.extend(y)
-        print(f"game: {game_count}")
+        #print(f"game: {game_count}")
         
         if game_count % 1000 == 0:
+            print(f"game: {game_count}")
             save_data(all_x, all_y, out_file)
             all_x.clear()
             all_y.clear()
