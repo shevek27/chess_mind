@@ -52,17 +52,5 @@ class ChessDataset(Dataset):
 
         
 
-# testing
-
-file_path = "processed_lichess_2020_oct_filtered.pkl"
-chess_dataset = ChessDataset(file_path)
-
-data_loader = DataLoader(chess_dataset, batch_size=64, shuffle=False)
-
-for features, labels in data_loader:
-    print("batch loaded:")
-    print(features.shape, labels.shape)
-    print(features, labels)
-    break
 
 
