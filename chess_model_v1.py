@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as func
+
 class chess_model_v1(nn.Module):
     def __init__(self):
         super(chess_model_v1).__init__()
