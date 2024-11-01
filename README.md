@@ -2,7 +2,7 @@
 
 Standard chess bot, trying to get it to the point that it can beat me (1200 in chess.com rapid) and beyond.
 
-## Featues
+## Features
 
 - **Position Evaluation**: Rudimentary evaluation function.
 - **Game Tree Search**: Explore and evaluate multiple move paths. Trying to implement alpha-beta pruning.
