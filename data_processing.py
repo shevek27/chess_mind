@@ -44,8 +44,6 @@ def encode_board(board):
 
     return encoded_board
 
-# due to the size of the pgn file, i have to process each game and write it
-# onto the output file one at a time, otherwise it would use all my memory and crash
 
 def load_pgn(pgn_file):
     # returns the games one by one
@@ -79,23 +77,10 @@ def extract_board_and_labels(game):
 
     return np.array(x), np.array(y)
 
-
-def save_data(x_data, y_data, file_path):
-    # save data in batches using pickle
-    data = {
-        "features":x_data,
-        "labels":y_data
-    }
-    with open(file_path, "ab") as file:
-        pickle.dump(data, file)
-    print(f"Saved {len(x_data)} entries to {file_path}.")    
-    x_data.clear()
-    y_data.clear()
-
-
 def prepare_training_dataset(in_file, out_file):
 
-
+    total_features = 0
+    i = 1
     all_x = []
     all_y = []
 
@@ -108,20 +93,29 @@ def prepare_training_dataset(in_file, out_file):
         # extend instead of append to add elements not lists
         all_x.extend(x)
         all_y.extend(y)
-        #print(f"game: {game_count}")
         
-        if game_count % 1000 == 0:
-            print(f"game: {game_count}")
-            save_data(all_x, all_y, out_file)
+
+        if game_count % 100 == 0:
+            print(f"game number: {game_count}")
+            print(f"actual number of features = {len(all_x)}")
+            print(f"total number of features = {total_features + len(all_x)}")
+
+
+
+    #if all_x and all_y:
+    #    save_data(all_x, all_y, out_file)
+        if len(all_x) > 100000:
+            filename = f"processed_dataset_{i}.npz"
+            np.savez(filename, features=all_x, labels=all_y)
+            i += 1
+            total_features += len(all_x)
             all_x.clear()
             all_y.clear()
-            
 
-
-    if all_x and all_y:
-        save_data(all_x, all_y, out_file)
+    all_x.clear()
+    all_y.clear()
 
 
 
 
-prepare_training_dataset("lichess_2020_oct_filtered.pgn", "processed_lichess_2020_oct_filtered.pkl")
+prepare_training_dataset("lichess_2020_oct_filtered.pgn", "test_processed_lichess_2020_oct_filtered.pkl")
