@@ -104,7 +104,7 @@ def prepare_training_dataset(in_file, out_file):
 
     #if all_x and all_y:
     #    save_data(all_x, all_y, out_file)
-        if len(all_x) > 100000:
+        if len(all_x) > 500000:
             filename = f"processed_dataset_{i}.npz"
             np.savez(filename, features=all_x, labels=all_y)
             i += 1
