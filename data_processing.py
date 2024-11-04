@@ -117,5 +117,5 @@ def prepare_training_dataset(in_file, out_file):
 
 
 
-
-prepare_training_dataset("lichess_2020_oct_filtered.pgn", "test_processed_lichess_2020_oct_filtered.pkl")
+if __name__ == "__main__":
+    prepare_training_dataset("lichess_2020_oct_filtered.pgn", "test_processed_lichess_2020_oct_filtered.pkl")

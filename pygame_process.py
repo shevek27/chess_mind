@@ -1,9 +1,13 @@
 import chess
 import chess.svg
 import pygame
+import torch
 from chess_drawing import *
 from sounds import *
 from chess_search_eval import *
+
+
+
 print("imports completed")
 
   
@@ -54,7 +58,7 @@ def main():
                 running = False
 
             elif board.turn == False and not board.is_checkmate():
-                move = find_best_move(board, 5)
+                move = find_best_move(board, 5, model=model)
                 make_move(move, board)
 
 

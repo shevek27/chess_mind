@@ -1,7 +1,10 @@
 import chess
+import torch
+from chess_model_v1 import *
+from data_processing import encode_board
+
 
 infinity = float('inf')
-
 
 
 def order_moves(board):
@@ -17,20 +20,16 @@ def order_moves(board):
 
     return captures + others
 
-def evaluate_position(board):
+def evaluate_position(board, model):
+    encoded_board_tensor = torch.tensor(encode_board(board), dtype=torch.float32).unsqueeze(0).permute(0,3,2,1)
 
     if board.is_checkmate():
         if board.turn: # white turn
             return -infinity
         else:
             return infinity
-
-    piece_values = {chess.PAWN: 1, chess.BISHOP: 3, chess.KNIGHT: 3, chess.ROOK: 5, chess.QUEEN: 9} 
-    score = 0
-    for piece_type in piece_values:
-        score += len(board.pieces(piece_type, chess.WHITE)) * piece_values[piece_type]
-        score -= len(board.pieces(piece_type, chess.BLACK)) * piece_values[piece_type]
-
+    with torch.inference_mode():
+        score = model(encoded_board_tensor)
     return score
 
 
@@ -93,9 +92,9 @@ def quiescence_search(board, alpha, beta, depth_limit):
 
 
     
-def alpha_beta_minimax(board, depth, alpha, beta, maximizing_player):
+def alpha_beta_minimax(board, depth, alpha, beta, maximizing_player, model):
     if depth == 0 or board.is_game_over():
-        return evaluate_position(board)
+        return evaluate_position(board, model)
         #return quiescence_search(board, alpha, beta, 3) # done at the end because its the only time we care
     
     moves = order_moves(board)
@@ -105,7 +104,7 @@ def alpha_beta_minimax(board, depth, alpha, beta, maximizing_player):
 
         for move in moves:
             board.push(move)
-            eval = alpha_beta_minimax(board, depth-1, alpha, beta, False)
+            eval = alpha_beta_minimax(board, depth-1, alpha, beta, False, model=model)
             board.pop()
             max_eval = max(eval, max_eval)
             alpha = max(alpha, eval)
@@ -119,7 +118,7 @@ def alpha_beta_minimax(board, depth, alpha, beta, maximizing_player):
         min_eval = float('inf')
         for move in moves:
             board.push(move)
-            eval = alpha_beta_minimax(board, depth-1, alpha, beta, True)
+            eval = alpha_beta_minimax(board, depth-1, alpha, beta, True, model=model)
             board.pop()
             min_eval = min(eval, min_eval)
             beta = min(beta, eval)
@@ -130,7 +129,7 @@ def alpha_beta_minimax(board, depth, alpha, beta, maximizing_player):
 
 
 
-def find_best_move(board, depth):
+def find_best_move(board, depth, model):
     best_move = None
     if board.turn == chess.WHITE:
         best_value = -float('inf')
@@ -140,7 +139,7 @@ def find_best_move(board, depth):
     for move in board.legal_moves:
         board.push(move)
         #move_value = minimax(board, depth, not board.turn)
-        move_value = alpha_beta_minimax(board, depth-1, alpha=infinity, beta=-infinity,  maximizing_player=not board.turn)
+        move_value = alpha_beta_minimax(board, depth-1, alpha=infinity, beta=-infinity,  maximizing_player=not board.turn, model=model)
         board.pop()
 
         if board.turn == chess.WHITE:
@@ -155,6 +154,9 @@ def find_best_move(board, depth):
 
 
     return best_move
+
+model = chess_model_v1()
+model.load_state_dict(torch.load("chess_model_v1.pth"))
 
 
 
